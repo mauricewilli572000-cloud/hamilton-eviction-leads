@@ -1,14 +1,14 @@
-import json, re, urllib.parse
+import json, re
 from curl_cffi import requests as cr
 S = cr.Session(impersonate="chrome")
 def show(tag, obj): print(f"@@{tag}@@ " + json.dumps(obj, default=str)[:6000])
-r = S.get("https://www.courtclerk.org/records-search/", timeout=60)
-links = sorted({urllib.parse.urljoin(str(r.url), h) for h in re.findall(r'href="([^"]+)"', r.text) if re.search(r"evict|schedule|address", h, re.I)})
-show("links", {"st": r.status_code, "captcha": bool(re.search(r"recaptcha|captcha|turnstile", r.text, re.I)), "links": links})
-for u in links[:6]:
-    p = S.get(u, timeout=60); t = p.text
-    forms = re.findall(r"<form.*?</form>", t, re.S)
-    show("page " + u, {"st": p.status_code, "captcha": bool(re.search(r"recaptcha|g-recaptcha|turnstile|hcaptcha", t, re.I)),
-         "forms": [{"tag": re.search(r"<form[^>]*>", f).group(0), "inputs": re.findall(r"<(?:input|select)[^>]*>", f)[:15],
-                    "options": re.findall(r"<option[^>]*>([^<]*)", f)[:20]} for f in forms[:3]],
-         "iframes": re.findall(r'<iframe[^>]+src="([^"]+)"', t)})
+p = S.get("https://www.courtclerk.org/records-search/eviction-schedule-search/", timeout=60)
+show("checkcc", re.findall(r"function checkcc.*?\n\}", p.text, re.S)[:1] + re.findall(r"recaptcha[^\"']*", p.text)[:5])
+for d in ["11/12/2026", "11/10/2026"]:
+    r = S.get("https://www.courtclerk.org/data/eviction_schedule.php", params={"chosendate": d, "court": "MCV", "location": "EVIM"}, timeout=60,
+              headers={"Referer": "https://www.courtclerk.org/records-search/eviction-schedule-search/"})
+    t = r.text
+    rows = re.findall(r"<tr[^>]*>(.*?)</tr>", t, re.S)
+    cells = [[re.sub(r"<[^>]+>|\s+", " ", c).strip() for c in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", x, re.S)] for x in rows]
+    show("sched " + d, {"st": r.status_code, "len": len(t), "captcha": bool(re.search(r"captcha", t, re.I)), "rows": len(rows), "cells": cells[:10],
+                        "links": re.findall(r'href="([^"]+)"', t)[:15], "text": re.sub(r"<script.*?</script>|<style.*?</style>|<[^>]+>|\s+", " ", t)[:1200]})
