@@ -32,3 +32,16 @@ def test_leads():
     l = leads[0]
     assert l["property_addresses"] == ["7053 NOBLE COURT, Cincinnati, OH 45239"]
     assert l["mailing_state"] == "TX" and l["owner_type"] == "individual" and l["tier"] in ("HOT", "WARM")
+
+
+def test_institutional_landlords_scored_down():
+    import config
+    cases = {}
+    for i in range(5):
+        c = {"case_number": f"26CV{i}", "hearing_date": "2026-11-01", "plaintiff": "VB NINE LLC", "defendant": "X",
+             "detail": {"filed_date": "2026-10-01", "plaintiffs": [{"name": "VB NINE LLC", "address": "1 MAIN ST DALLAS TX 75201", "role": "P"}],
+                        "defendants": [{"name": "X", "address": f"{i}0 ELM ST CINCINNATI OH 45211", "role": "D"}]}}
+        cases[c["case_number"]] = c
+    l = E.build_leads(cases, dt.date(2026, 11, 11))[0]
+    assert l["tier"] == "COLD" and any("institutional" in s for s in l["signals"])
+    assert E.is_entity("AMERICAN AVE I PM") and E.is_entity("BH NEW ARTS L P")

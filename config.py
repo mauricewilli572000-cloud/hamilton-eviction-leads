@@ -14,6 +14,7 @@ REFERER = BASE + "/records-search/eviction-schedule-search/"
 DAYS_BACK = 45            # schedules re-read each run (cases are cached, only new ones are looked up)
 DAYS_FORWARD = 21
 MAX_CASE_LOOKUPS = 1500   # per run; the rest are picked up the next day
+LOOKUP_TIME_BUDGET = 35 * 60   # seconds; stop looking up cases after this so the job never times out
 REQUEST_DELAY = 1.0       # seconds between requests - be polite to the clerk's site
 
 EXCLUDE_PLAINTIFFS = ["CINCINNATI METROPOLITAN HOUSING", "CMHA", "HOUSING AUTHORITY", "CITY OF CINCINNATI",
@@ -21,7 +22,12 @@ EXCLUDE_PLAINTIFFS = ["CINCINNATI METROPOLITAN HOUSING", "CMHA", "HOUSING AUTHOR
 ENTITY_WORDS = ["LLC", "L.L.C", "INC", "CORP", "COMPANY", " CO ", "LTD", " LP", "LLP", "TRUST", "PROPERTIES",
                 "HOLDINGS", "INVESTMENTS", "MANAGEMENT", "REALTY", "HOMES", "APARTMENTS", "ASSOCIATES", "GROUP",
                 "PARTNERS", "ENTERPRISES", "VENTURES", "CAPITAL", "RENTALS", "HOUSING", "CHURCH", "BANK", "FUND",
-                "LEASECO", "PORTFOLIO", "VILLAGE", "COMMONS", "TOWNHOMES"]
+                "LEASECO", "PORTFOLIO", "VILLAGE", "COMMONS", "TOWNHOMES", " L P", "DEVELOPMENT", " PM",
+                "OWNER", "SFR", "PROPCO", "BORROWER", "ESTATES", "LIMITED", "PARTNERSHIP", " II", " III", " IV"]
+# Entities filing this many evictions in 12 months are treated as large / institutional landlords.
+INSTITUTIONAL_FILINGS = 4
+INSTITUTIONAL_WORDS = ["SFR", "AMERICAN AVE", "AMERICAN HOMES", "INVITATION", "PROGRESS RESIDENTIAL", "VB ", "VINEBROOK",
+                       "NREA", "FIRSTKEY", "TRICON", "HOME PARTNERS", "MAIN STREET RENEWAL", "PRETIUM", "CERBERUS"]
 LARGE_MANAGER_WORDS = ["MANAGEMENT", "APARTMENTS", "COMMUNITIES", "RESIDENTIAL", "LEASECO", "TOWNHOMES", "COMMONS"]
 
 ROOT = Path(__file__).resolve().parent

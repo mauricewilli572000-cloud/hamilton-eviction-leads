@@ -44,8 +44,11 @@ def main() -> int:
     log.info("Schedules: %d hearings read, %d new cases, %d cases stored", seen, new, len(cases))
 
     todo = [k for k, c in cases.items() if not c.get("detail")]
-    done = 0
+    done, started = 0, time.monotonic()
     for k in todo[: config.MAX_CASE_LOOKUPS]:
+        if time.monotonic() - started > config.LOOKUP_TIME_BUDGET:
+            log.info("Lookup time budget reached; the rest continue next run")
+            break
         try:
             cases[k]["detail"] = E.fetch_case(k)
             done += 1

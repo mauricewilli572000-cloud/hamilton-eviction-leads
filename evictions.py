@@ -159,7 +159,9 @@ def build_leads(cases: dict[str, dict], today: dt.date) -> list[dict]:
         n90 = sum(1 for d in dates if d >= q_ago)
         entity = is_entity(name)
         out_state = bool(mail.get("state")) and mail["state"] != "OH"
-        large = any(w in name.upper() for w in config.LARGE_MANAGER_WORDS) or len(props) > 25
+        institutional = any(w in f" {name.upper()}" for w in config.INSTITUTIONAL_WORDS) or \
+            (entity and n12 >= config.INSTITUTIONAL_FILINGS)
+        large = institutional or any(w in name.upper() for w in config.LARGE_MANAGER_WORDS) or len(props) > 25
         score, signals = 0, []
         b = min(40, 10 * n12); score += b; signals.append(f"{n12} eviction filing(s) (+{b})")
         if n90 >= 2:
@@ -168,10 +170,11 @@ def build_leads(cases: dict[str, dict], today: dt.date) -> list[dict]:
             score += 20; signals.append("individual landlord (+20)")
         if props and len(props) <= 5:
             score += 15; signals.append(f"small landlord: {len(props)} rental address(es) in filings (+15)")
-        if out_state:
+        if out_state and not large:
             score += 10; signals.append(f"landlord address out of state ({mail['state']}) (+10)")
         if large:
-            score -= 30; signals.append("large manager / complex (-30)")
+            score -= 30; signals.append("institutional / large landlord (-30)" if institutional
+                                        else "large manager / complex (-30)")
         score = max(0, min(100, score))
         leads.append({
             "lead_id": hashlib.sha1(k.encode()).hexdigest()[:12],
