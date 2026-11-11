@@ -23,7 +23,8 @@ ENTITY_WORDS = ["LLC", "L.L.C", "INC", "CORP", "COMPANY", " CO ", "LTD", " LP", 
                 "HOLDINGS", "INVESTMENTS", "MANAGEMENT", "REALTY", "HOMES", "APARTMENTS", "ASSOCIATES", "GROUP",
                 "PARTNERS", "ENTERPRISES", "VENTURES", "CAPITAL", "RENTALS", "HOUSING", "CHURCH", "BANK", "FUND",
                 "LEASECO", "PORTFOLIO", "VILLAGE", "COMMONS", "TOWNHOMES", " L P", "DEVELOPMENT", " PM",
-                "OWNER", "SFR", "PROPCO", "BORROWER", "ESTATES", "LIMITED", "PARTNERSHIP", " II", " III", " IV"]
+                "OWNER", "SFR", "PROPCO", "BORROWER", "ESTATES", "LIMITED", "PARTNERSHIP", " II", " III", " IV",
+                "SERVICES", "PRESERVATION", "REAL ESTATE", "PROPERTY", "RENTAL", "LAND"]
 # Entities filing this many evictions in 12 months are treated as large / institutional landlords.
 INSTITUTIONAL_FILINGS = 4
 INSTITUTIONAL_WORDS = ["SFR", "AMERICAN AVE", "AMERICAN HOMES", "INVITATION", "PROGRESS RESIDENTIAL", "VB ", "VINEBROOK",

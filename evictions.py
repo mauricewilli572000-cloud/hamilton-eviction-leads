@@ -125,7 +125,7 @@ def landlord_key(name: str) -> str:
 
 def is_entity(name: str) -> bool:
     n = f" {name.upper()} "
-    return any(w in n for w in config.ENTITY_WORDS)
+    return bool(re.match(r"^\s*\d", name)) or any(w in n for w in config.ENTITY_WORDS)
 
 
 def excluded(name: str) -> bool:
@@ -168,13 +168,14 @@ def build_leads(cases: dict[str, dict], today: dt.date) -> list[dict]:
             score += 10; signals.append("2+ filings in 90 days (+10)")
         if not entity:
             score += 20; signals.append("individual landlord (+20)")
-        if props and len(props) <= 5:
+        if props and len(props) <= 5 and not large:
             score += 15; signals.append(f"small landlord: {len(props)} rental address(es) in filings (+15)")
         if out_state and not large:
             score += 10; signals.append(f"landlord address out of state ({mail['state']}) (+10)")
         if large:
-            score -= 30; signals.append("institutional / large landlord (-30)" if institutional
-                                        else "large manager / complex (-30)")
+            pen = 40 if institutional else 30
+            score -= pen; signals.append(f"institutional / large landlord (-{pen})" if institutional
+                                         else f"large manager / complex (-{pen})")
         score = max(0, min(100, score))
         leads.append({
             "lead_id": hashlib.sha1(k.encode()).hexdigest()[:12],
