@@ -11,11 +11,11 @@ BASE = "https://www.courtclerk.org"
 SCHEDULE_URL = BASE + "/data/eviction_schedule.php"
 SUMMARY_URL = BASE + "/data/case_summary.php"
 REFERER = BASE + "/records-search/eviction-schedule-search/"
-DAYS_BACK = 45            # schedules re-read each run (cases are cached, only new ones are looked up)
+DAYS_BACK = 7             # schedules re-read each run (cases are stored, so a short look-back is enough)
 DAYS_FORWARD = 21
-MAX_CASE_LOOKUPS = 1500   # per run; the rest are picked up the next day
+MAX_CASE_LOOKUPS = 150    # per run; kept low so the clerk site sees normal traffic (its terms forbid bulk mining)
 LOOKUP_TIME_BUDGET = 35 * 60   # seconds; stop looking up cases after this so the job never times out
-REQUEST_DELAY = 1.0       # seconds between requests - be polite to the clerk's site
+REQUEST_DELAY = 3.0       # seconds between requests - be polite to the clerk's site
 
 EXCLUDE_PLAINTIFFS = ["CINCINNATI METROPOLITAN HOUSING", "CMHA", "HOUSING AUTHORITY", "CITY OF CINCINNATI",
                       "HAMILTON COUNTY LAND", "LAND REUTILIZATION", "PORT AUTHORITY"]
